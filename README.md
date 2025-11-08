@@ -4,6 +4,8 @@
 - [Google Colab](#google-colab)
 - [Merge LoRa](#merge-lora)
 - [Convert and quantization](#convert-and-quantization)
+- [Text to json convert](#text-to-json-convert)
+- [Modelfile](#modelfile)
 - [Credits](#credits)
 
 # Description
@@ -83,6 +85,13 @@ Configuration Parameters:
 - QUANTIZATION_GROUP_SIZE = "8"           # Group size for quantization (typically 8 or 32)
 - MODEL_INPUT_DIR = "./merged-model"      # Path to the Hugging Face model directory or local path
 - OUTPUT_DIR = "./gguf-output"            # Destination folder for converted and quantized files
+
+# Text to json convert
+
+This script converts a dataset into a clean JSON file for fine-tuning language models. It accepts input in CSV, TXT, or JSON format, extracts prompt–completion pairs, removes duplicates, and saves the result in a standardized location (prompt::completion)
+
+# Modelfile
+This file is for ollama. modify with notepad and use in the same older of the output model the command: "ollama create choose_a_name".
 
 # Credits
 Credits to llama.cpp (see submodule in the extern folder) for providing the core logic used in quantization and GGUF conversion. The script gguf_convert_quantization.py automatically calls their build and conversion routines.
