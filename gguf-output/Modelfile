@@ -1,0 +1,3 @@
+FROM model-q4_k_m.gguf
+
+SYSTEM "You are a helpful assistant trained to support Unity workflows and code generation."
