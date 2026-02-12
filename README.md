@@ -20,6 +20,10 @@
 
 Inside the tools folder, there is a script dedicated to converting datasets into Prompt::completion format. This script allows you to transform a raw .txt file (with lines in prompt::completion format) into a .json file compatible with fine-tuning an LLM model. It is designed to be used in combination with the Colab scripts provided.
 
+NOTE: Some models, such as Mistral, can be challenging to fine-tune effectively.
+
+<img src="Assets/llama_interface.webp" width="800" alt="Llama.cpp Interface Example">
+
 # Requirements
 
 To compile llama.cpp and use the quantization tools, the following dependencies are required:
@@ -91,7 +95,7 @@ Configuration Parameters:
 This script converts a dataset into a clean JSON file for fine-tuning language models. It accepts input in CSV, TXT, or JSON format, extracts prompt–completion pairs, removes duplicates, and saves the result in a standardized location (prompt::completion)
 
 # Modelfile
-This file is for ollama. modify with notepad and use in the same older of the output model the command: "ollama create choose_a_name".
+This file is for ollama. modify with notepad and use in the same folder of the output model the command: "ollama create choose_a_name".
 
 # Credits
 Credits to llama.cpp (see submodule in the extern folder) for providing the core logic used in quantization and GGUF conversion. The script gguf_convert_quantization.py automatically calls their build and conversion routines.
