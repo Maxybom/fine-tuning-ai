@@ -20,6 +20,7 @@
   The conversion to GGUF format and quantization are based on llama.cpp, already configured as a submodule. The compilation script runs automatically when you start the gguf_convert_quantization.py script.
 
 Inside the tools folder, there is a script dedicated to converting datasets into Prompt::completion format. This script allows you to transform a raw .txt file (with lines in prompt::completion format) into a .json file compatible with fine-tuning an LLM model. It is designed to be used in combination with the Colab scripts provided.
+
 **NOTE:** Some models, such as Mistral, can be challenging to fine-tune effectively. Tested on Ubuntu 24.04 LTS, Windows and mac tested with github actions. Also tested on docker but file not included.
 
 <img src="Assets/llama_interface.webp" width="800" alt="Llama.cpp Interface Example">
