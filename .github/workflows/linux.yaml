@@ -8,7 +8,6 @@ on:
 
 jobs:
   test-scripts:
-    # GitHub usa Ubuntu (solitamente l'ultima versione stabile LTS)
     runs-on: ubuntu-latest
     
     steps:

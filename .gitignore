@@ -210,8 +210,6 @@ __marimo__/
 merged-model/
 gguf-output/
 *.gguf
-*.safetensors
-*.bin
 
 #Docker
 Docker/
