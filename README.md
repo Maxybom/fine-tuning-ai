@@ -1,6 +1,7 @@
 # fine-tuning-ai
 - [Description](#description)
 - [Requirements](#requirements)
+- [Installation](#installation)
 - [Google Colab](#google-colab)
 - [Merge LoRa](#merge-lora)
 - [Convert and quantization](#convert-and-quantization)
@@ -19,8 +20,7 @@
   The conversion to GGUF format and quantization are based on llama.cpp, already configured as a submodule. The compilation script runs automatically when you start the gguf_convert_quantization.py script.
 
 Inside the tools folder, there is a script dedicated to converting datasets into Prompt::completion format. This script allows you to transform a raw .txt file (with lines in prompt::completion format) into a .json file compatible with fine-tuning an LLM model. It is designed to be used in combination with the Colab scripts provided.
-
-NOTE: Some models, such as Mistral, can be challenging to fine-tune effectively.
+**NOTE:** Some models, such as Mistral, can be challenging to fine-tune effectively. Tested on Ubuntu 24.04 LTS, Windows and mac tested with github actions. Also tested on docker but file not included.
 
 <img src="Assets/llama_interface.webp" width="800" alt="Llama.cpp Interface Example">
 
@@ -50,6 +50,19 @@ macOS:
 Linux:
  - build-essential (includes make, g++, etc.)
 
+  
+
+   # Installation
+
+To set up the project and install all necessary dependencies:
+
+ **Clone the repository including submodules:**
+ 
+   git clone --recursive [https://github.com/Maxybom/fine-tuning-ai.git](https://github.com/Maxybom/fine-tuning-ai.git)
+
+   pip install -r requirements.txt
+   
+
 # Google Colab
 
 Follow the scripts provided for common GPU setups on Google Colab.
@@ -71,6 +84,8 @@ Follow the scripts provided for common GPU setups on Google Colab.
  - base_model_path: the path to the original LLM checkpoint
  - lora_adapter_path: the path to the LoRA file to be merged
  - merged_output_path: the destination directory for the merged model
+
+   **NOTE:** Actually there is some tiny LoRa file to test the script, the model is SmolLM-135M-Instruct.Is alerady set.
 
 # Convert and quantization
 
@@ -95,7 +110,9 @@ Configuration Parameters:
 This script converts a dataset into a clean JSON file for fine-tuning language models. It accepts input in CSV, TXT, or JSON format, extracts prompt–completion pairs, removes duplicates, and saves the result in a standardized location (prompt::completion)
 
 # Modelfile
+
 This file is for ollama. modify with notepad and use in the same folder of the output model the command: "ollama create choose_a_name".
 
 # Credits
+
 Credits to llama.cpp (see submodule in the extern folder) for providing the core logic used in quantization and GGUF conversion. The script gguf_convert_quantization.py automatically calls their build and conversion routines.
