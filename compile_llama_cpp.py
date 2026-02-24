@@ -2,97 +2,97 @@ import os
 import shutil
 import subprocess
 import platform
+import sys
 
 def compile_llama_cpp():
     os_name = platform.system()
     missing_tools = False
 
+    print(f"--- Checking tools for OS: {os_name} ---")
+
     if shutil.which("cmake") is None:
-        print("'cmake' not found. Please install it from https://cmake.org/download/")
+        print("ERROR: 'cmake' not found. Please install it.")
         missing_tools = True
     else:
-        print("CMake detected.")
+        print("[OK] CMake detected.")
 
     if os_name in ("Linux", "Darwin"):
         if shutil.which("make") is None and shutil.which("ninja") is None:
-            print("Neither 'make' nor 'ninja' found. Install with: sudo apt install build-essential (Linux) or xcode-select --install (macOS)")
+            print("ERROR: Neither 'make' nor 'ninja' found.")
             missing_tools = True
         else:
-            print("Make or Ninja detected.")
+            print("[OK] Build tools detected.")
 
         if shutil.which("g++") is None and shutil.which("clang++") is None:
-            print("No C++ compiler found. Install with: sudo apt install build-essential (Linux) or xcode-select --install (macOS)")
+            print("ERROR: No C++ compiler found.")
             missing_tools = True
         else:
-            print("C++ compiler detected.")
+            print("[OK] C++ compiler detected.")
 
-    def get_cmake_generators():
-        try:
-            result = subprocess.run(["cmake", "--help"], capture_output=True, text=True)
-            return result.stdout
-        except Exception:
-            return ""
+    if missing_tools:
+        return False
 
+    cwd = os.getcwd()
+    llama_root = os.path.join(cwd, "extern", "llama.cpp")
+    build_dir = os.path.join(llama_root, "build")
     
+    if not os.path.exists(llama_root):
+        print(f"ERROR: llama.cpp not found at: {llama_root}")
+        return False
+
+    os.makedirs(build_dir, exist_ok=True)
+
     def find_generator():
-        help_text = get_cmake_generators()
+        try:
+            help_text = subprocess.run(["cmake", "--help"], capture_output=True, text=True).stdout
+        except:
+            return None
+            
         if os_name == "Windows":
-            candidates = [
-                "Visual Studio 17 2022",
-                "Visual Studio 16 2019",
-                "MinGW Makefiles",
-                "Ninja"
-            ]
-        elif os_name == "Darwin":
-            candidates = [
-                "Xcode",
-                "Unix Makefiles",
-                "Ninja"
-            ]
-        else:  # Linux
-            candidates = [
-                "Unix Makefiles",
-                "Ninja"
-            ]
+            candidates = ["Visual Studio 17 2022", "Visual Studio 16 2019", "MinGW Makefiles", "Ninja"]
+        else:
+            candidates = ["Unix Makefiles", "Ninja", "Xcode"]
+            
         for gen in candidates:
             if gen in help_text:
                 return gen
         return None
 
-    if missing_tools:
-        print("Missing required tools. Compilation aborted.")
-        return False
-
-    llama_root = os.path.abspath("extern/llama.cpp")
-    build_dir = os.path.join(llama_root, "build")
-    os.makedirs(build_dir, exist_ok=True)
-
-    cache_file = os.path.join(build_dir, "CMakeCache.txt")
-    cache_dir = os.path.join(build_dir, "CMakeFiles")
-    if os.path.exists(cache_file):
-        os.remove(cache_file)
-    if os.path.exists(cache_dir):
-        shutil.rmtree(cache_dir)
-
     generator = find_generator()
     if not generator:
-        print("No supported CMake generator found. Please install Visual Studio, Make, Ninja, or Xcode.")
+        print("ERROR: No CMake generator found.")
         return False
-
-    cmake_cmd = ["cmake", "..", "-G", generator]
-    if os_name == "Windows" and "Visual Studio" in generator:
-        cmake_cmd += ["-A", "x64", "-DLLAMA_CURL=OFF"]
-
-    # Compile the 'llama-quantize' target in Release mode
-    build_cmd = ["cmake", "--build", ".", "--target", "llama-quantize", "--config", "Release"]
 
     print(f"Using generator: {generator}")
-    print("Starting compilation...")
+    base_cmd = ["cmake", "..", "-G", generator, "-DCMAKE_BUILD_TYPE=Release"]
+
+    if os_name == "Windows" and "Visual Studio" in generator:
+        base_cmd += ["-A", "x64"]
+
+    print("\n--- Configuration ---")
     try:
-        subprocess.run(cmake_cmd, cwd=build_dir, check=True)
+        subprocess.run(base_cmd, cwd=build_dir, check=True)
+    except subprocess.CalledProcessError:
+        print("Attempting Offline Mode...")
+        shutil.rmtree(os.path.join(build_dir, "CMakeFiles"), ignore_errors=True)
+        if os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
+            os.remove(os.path.join(build_dir, "CMakeCache.txt"))
+        
+        try:
+            subprocess.run(base_cmd + ["-DLLAMA_CURL=OFF"], cwd=build_dir, check=True)
+        except subprocess.CalledProcessError:
+            return False
+
+    print("\n--- Build ---")
+    build_cmd = ["cmake", "--build", ".", "--target", "llama-quantize", "--config", "Release", "-j", "4"]
+    try:
         subprocess.run(build_cmd, cwd=build_dir, check=True)
-        print("Compilation completed successfully.")
+        print("\n" + "="*30)
+        print(" BUILD SUCCESSFUL ")
+        print("="*30 + "\n")
         return True
-    except subprocess.CalledProcessError as e:
-        print(f"Compilation failed: {e}")
+    except subprocess.CalledProcessError:
         return False
+
+if __name__ == "__main__":
+    compile_llama_cpp()
