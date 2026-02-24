@@ -212,3 +212,6 @@ gguf-output/
 *.gguf
 *.safetensors
 *.bin
+
+#Docker
+Docker/
